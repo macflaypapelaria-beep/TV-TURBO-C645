@@ -4,38 +4,33 @@
     android:viewportWidth="512"
     android:viewportHeight="512">
 
-    <path
-        android:fillColor="#000000"
-        android:pathData="M0,0H512V512H0Z" />
+    <path android:fillColor="#000000" android:pathData="M0,0H512V512H0Z" />
 
-    <!-- Moldura angular rubro-negra, desenho próprio -->
+    <!-- Arcos rubro-negros próprios: identidade esportiva sem símbolos de terceiros -->
     <path
         android:fillColor="#00000000"
         android:strokeColor="#E10600"
-        android:strokeWidth="12"
-        android:pathData="M256,42 L398,118 L430,274 L344,422 L168,422 L82,274 L114,118 Z" />
-
-    <!-- Caveira geométrica original: cabeça curta, mandíbula compacta -->
+        android:strokeWidth="10"
+        android:strokeLineCap="round"
+        android:pathData="M82,182 C122,92 212,54 300,70 C350,78 394,104 424,142" />
     <path
-        android:fillColor="#171717"
-        android:strokeColor="#B80000"
-        android:strokeWidth="8"
-        android:pathData="M172,118 L256,82 L340,118 L374,196 L352,284 L314,316 L306,360 L206,360 L198,316 L160,284 L138,196 Z" />
+        android:fillColor="#00000000"
+        android:strokeColor="#5A0505"
+        android:strokeWidth="7"
+        android:strokeLineCap="round"
+        android:pathData="M94,350 C138,414 214,444 290,434 C352,426 400,396 428,354" />
 
-    <!-- Olhos triangulares -->
-    <path android:fillColor="#E10600" android:pathData="M176,194 L236,184 L216,236 L168,226 Z" />
-    <path android:fillColor="#E10600" android:pathData="M336,194 L276,184 L296,236 L344,226 Z" />
+    <!-- MAC angular: vermelho + branco para alto contraste -->
+    <path
+        android:fillColor="#E10600"
+        android:pathData="M58,330 L58,174 L96,174 L152,252 L208,174 L246,174 L246,330 L208,330 L208,238 L152,316 L96,238 L96,330 Z" />
+    <path
+        android:fillColor="#E10600"
+        android:pathData="M212,330 L274,174 H314 L376,330 H334 L322,296 H266 L254,330 Z M280,258 H308 L294,218 Z" />
+    <path
+        android:fillColor="#F3F3F3"
+        android:pathData="M342,174 H444 L462,194 V218 H382 V286 H462 V310 L444,330 H342 L326,314 V190 Z" />
 
-    <!-- Nariz em losango -->
-    <path android:fillColor="#F2F2F2" android:pathData="M256,228 L274,258 L256,278 L238,258 Z" />
-
-    <!-- Mandíbula curta em três módulos -->
-    <path android:fillColor="#E10600" android:pathData="M214,304 H238 V340 H214 Z" />
-    <path android:fillColor="#F2F2F2" android:pathData="M244,304 H268 V344 H244 Z" />
-    <path android:fillColor="#E10600" android:pathData="M274,304 H298 V340 H274 Z" />
-
-    <!-- Monograma MAC angular -->
-    <path android:fillColor="#E10600" android:pathData="M64,382 L64,304 L86,304 L112,344 L138,304 L160,304 L160,382 L138,382 L138,338 L112,376 L86,338 L86,382 Z" />
-    <path android:fillColor="#F2F2F2" android:pathData="M174,382 L208,304 H234 L268,382 H244 L237,364 H205 L198,382 Z M213,344 H229 L221,323 Z" />
-    <path android:fillColor="#E10600" android:pathData="M286,304 H362 L382,324 L362,344 H316 V362 H366 V382 H294 L286,374 Z" />
+    <!-- Pequeno traço de assinatura visual -->
+    <path android:fillColor="#E10600" android:pathData="M154,372 H358 V382 H154 Z" />
 </vector>
