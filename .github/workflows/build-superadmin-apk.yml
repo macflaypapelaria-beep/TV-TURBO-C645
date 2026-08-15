@@ -39,16 +39,16 @@ jobs:
       - name: Prepare unsigned APK and signer
         run: |
           mkdir -p output
-          cp superadmin-android/app/build/outputs/apk/release/app-release-unsigned.apk output/MAC-SUPERADMIN-v1.0.2-unsigned.apk
+          cp superadmin-android/app/build/outputs/apk/release/app-release-unsigned.apk output/MAC-SUPERADMIN-v1.0.3-unsigned.apk
           APKSIGNER_JAR="$(find "$ANDROID_HOME/build-tools" -path '*/lib/apksigner.jar' -type f | sort -V | tail -n 1)"
           test -n "$APKSIGNER_JAR"
           cp "$APKSIGNER_JAR" output/apksigner.jar
-          sha256sum output/MAC-SUPERADMIN-v1.0.2-unsigned.apk | tee output/SHA256SUMS.txt
+          sha256sum output/MAC-SUPERADMIN-v1.0.3-unsigned.apk | tee output/SHA256SUMS.txt
 
       - name: Upload unsigned build tools
         uses: actions/upload-artifact@v4
         with:
-          name: mac-superadmin-unsigned-v1.0.2
+          name: mac-superadmin-unsigned-v1.0.3
           path: output/
           if-no-files-found: error
           retention-days: 1
