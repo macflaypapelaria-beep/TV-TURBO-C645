@@ -32,6 +32,8 @@ Abra a pasta do projeto e execute **Build > Build APK(s)**.
 ### GitHub Actions
 O arquivo `.github/workflows/build-apk.yml` gera `app-debug.apk` automaticamente e publica o APK como artefato do workflow.
 
+Build automático habilitado no branch `main`.
+
 ## Observação técnica
 
 A v1 fixa Shizuku API 13.1.5 e usa `Shizuku.newProcess` via reflexão. Essa API está marcada para futura remoção pelo projeto Shizuku. A próxima revisão deve migrar o executor para `UserService` antes de atualizar a dependência.
