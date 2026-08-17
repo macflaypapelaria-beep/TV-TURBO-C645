@@ -29,7 +29,7 @@ import java.nio.charset.StandardCharsets;
 public class MainActivity extends Activity {
     private static final String BASE_URL = "https://pwzmywuxdgutslqeypas.supabase.co/functions/v1/superadmin-app";
     private static final String ALLOWED_HOST = "pwzmywuxdgutslqeypas.supabase.co";
-    private static final int FILE_CHOOSER_REQUEST = 4606;
+    private static final int FILE_CHOOSER_REQUEST = 4607;
 
     private WebView webView;
     private ProgressBar progressBar;
@@ -43,19 +43,12 @@ public class MainActivity extends Activity {
 
         FrameLayout root = new FrameLayout(this);
         root.setBackgroundColor(Color.BLACK);
-
         webView = new WebView(this);
-        root.addView(webView, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-        ));
+        root.addView(webView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
         progressBar.setMax(100);
-        FrameLayout.LayoutParams pp = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                Math.max(2, Math.round(3 * getResources().getDisplayMetrics().density))
-        );
+        FrameLayout.LayoutParams pp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Math.max(2, Math.round(3 * getResources().getDisplayMetrics().density)));
         pp.gravity = android.view.Gravity.TOP;
         root.addView(progressBar, pp);
 
@@ -80,27 +73,22 @@ public class MainActivity extends Activity {
         s.setLoadWithOverviewMode(true);
         s.setUseWideViewPort(true);
         s.setCacheMode(WebSettings.LOAD_NO_CACHE);
-        s.setUserAgentString(s.getUserAgentString() + " MAC-SUPERADMIN-ANDROID/1.0.6");
+        s.setUserAgentString(s.getUserAgentString() + " MAC-SUPERADMIN-ANDROID/1.0.7");
 
         CookieManager cm = CookieManager.getInstance();
         cm.setAcceptCookie(true);
         cm.setAcceptThirdPartyCookies(webView, true);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            WebView.startSafeBrowsing(this, null);
-        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) WebView.startSafeBrowsing(this, null);
 
         webView.setWebChromeClient(new WebChromeClient() {
-            @Override
-            public void onProgressChanged(WebView view, int newProgress) {
+            @Override public void onProgressChanged(WebView view, int newProgress) {
                 progressBar.setProgress(newProgress);
                 progressBar.setVisibility(newProgress >= 100 ? View.GONE : View.VISIBLE);
             }
 
-            @Override
-            public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallbackNew, FileChooserParams fileChooserParams) {
+            @Override public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> cb, FileChooserParams params) {
                 if (filePathCallback != null) filePathCallback.onReceiveValue(null);
-                filePathCallback = filePathCallbackNew;
+                filePathCallback = cb;
                 Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 intent.setType("image/*");
@@ -118,27 +106,18 @@ public class MainActivity extends Activity {
         });
 
         webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
-                if (uri != null && "https".equalsIgnoreCase(uri.getScheme()) && ALLOWED_HOST.equalsIgnoreCase(uri.getHost())) {
-                    return false;
-                }
+                if (uri != null && "https".equalsIgnoreCase(uri.getScheme()) && ALLOWED_HOST.equalsIgnoreCase(uri.getHost())) return false;
                 if (uri != null) {
-                    try {
-                        startActivity(new Intent(Intent.ACTION_VIEW, uri));
-                    } catch (Exception ex) {
-                        Toast.makeText(MainActivity.this, "Não foi possível abrir este link.", Toast.LENGTH_SHORT).show();
-                    }
+                    try { startActivity(new Intent(Intent.ACTION_VIEW, uri)); }
+                    catch (Exception ex) { Toast.makeText(MainActivity.this, "Não foi possível abrir este link.", Toast.LENGTH_SHORT).show(); }
                 }
                 return true;
             }
 
-            @Override
-            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-                if (request.isForMainFrame()) {
-                    Toast.makeText(MainActivity.this, "Falha ao carregar o SUPERADMIN.", Toast.LENGTH_SHORT).show();
-                }
+            @Override public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                if (request.isForMainFrame()) Toast.makeText(MainActivity.this, "Falha ao carregar o SUPERADMIN.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -149,58 +128,55 @@ public class MainActivity extends Activity {
             progressBar.setIndeterminate(true);
             String html = readAsset("superadmin.html");
             String addon = readAsset("superadmin-addon.js");
-            String script = "<script>" + addon + "</script>";
-            if (html.contains("</body>")) html = html.replace("</body>", script + "</body>");
-            else html += script;
+            String marker = "E('pass').addEventListener('keydown',e=>{if(e.key==='Enter')login()});init();";
+
+            // Executa os controles extras antes do init() da interface principal.
+            // Isso elimina a dependência de um segundo <script> carregado depois da tela.
+            if (html.contains(marker)) {
+                html = html.replace(marker, addon + "\n" + marker);
+            } else if (html.contains("</body>")) {
+                html = html.replace("</body>", "<script>" + addon + "</script></body>");
+            } else {
+                html += "<script>" + addon + "</script>";
+            }
+
             progressBar.setIndeterminate(false);
             webView.loadDataWithBaseURL(BASE_URL, html, "text/html", "UTF-8", BASE_URL);
         } catch (Exception ex) {
             progressBar.setVisibility(View.GONE);
-            String msg = "<!doctype html><meta name='viewport' content='width=device-width,initial-scale=1'><body style='margin:0;background:#050608;color:#fff;font-family:Arial;padding:30px'><h2 style='color:#ef1b24'>MAC SUPERADMIN</h2><p>Não foi possível carregar a interface local.</p></body>";
+            String msg = "<!doctype html><meta name='viewport' content='width=device-width,initial-scale=1'><body style='margin:0;background:#050608;color:#fff;font-family:Arial;padding:30px'><h2 style='color:#ef1b24'>MAC SUPERADMIN</h2><p>Não foi possível carregar a interface local.</p><p>Versão 1.0.7</p></body>";
             webView.loadDataWithBaseURL(BASE_URL, msg, "text/html", "UTF-8", BASE_URL);
         }
     }
 
     private String readAsset(String name) throws Exception {
         StringBuilder out = new StringBuilder();
-        try (InputStream stream = getAssets().open(name);
-             BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+        try (InputStream stream = getAssets().open(name); BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) out.append(line).append('\n');
         }
         return out.toString();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode != FILE_CHOOSER_REQUEST) return;
-        if (filePathCallback == null) return;
+        if (requestCode != FILE_CHOOSER_REQUEST || filePathCallback == null) return;
         Uri[] results = null;
-        if (resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
-            results = new Uri[]{data.getData()};
-        }
+        if (resultCode == Activity.RESULT_OK && data != null && data.getData() != null) results = new Uri[]{data.getData()};
         filePathCallback.onReceiveValue(results);
         filePathCallback = null;
     }
 
-    @Override
-    public void onBackPressed() {
+    @Override public void onBackPressed() {
         if (webView != null) {
             webView.evaluateJavascript("(function(){var m=document.getElementById('modalBack'),s=document.getElementById('sheet');if(m&&m.classList.contains('on')){closeModal();return '1'}if(s&&s.classList.contains('on')){closeSheet();return '1'}return '0'})()", value -> {
                 if (!"\"1\"".equals(value)) MainActivity.super.onBackPressed();
             });
-        } else {
-            super.onBackPressed();
-        }
+        } else super.onBackPressed();
     }
 
-    @Override
-    protected void onDestroy() {
-        if (filePathCallback != null) {
-            filePathCallback.onReceiveValue(null);
-            filePathCallback = null;
-        }
+    @Override protected void onDestroy() {
+        if (filePathCallback != null) { filePathCallback.onReceiveValue(null); filePathCallback = null; }
         if (webView != null) {
             webView.stopLoading();
             webView.loadUrl("about:blank");
